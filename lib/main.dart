@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mozz_chat_app/app.dart';
-import 'package:mozz_chat_app/theme.dart';
+import 'package:mozz_chat_app/theme/theme.dart';
 
 void main() {
-  runApp(MaterialApp());
+  runApp(MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
