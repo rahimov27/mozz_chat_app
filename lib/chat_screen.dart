@@ -81,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
             RecieveMessageWidget(formattedTime: formattedTime),
             Spacer(),
 
-            // textfield part
+            // Textfield part
             Padding(
               padding: const EdgeInsets.only(bottom: 23, left: 20, right: 20),
               child: Row(
@@ -104,6 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       width: double.infinity,
                       height: 42,
                       child: TextField(
+                        cursorColor: AppColors.gray,
                         onSubmitted: (value) {
                           _sendMessage(value);
                         },
@@ -112,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           fontSize: 16,
                           fontFamily: "Gilroy",
                           fontWeight: FontWeight.w500,
-                          color: AppColors.gray,
+                          color: AppColors.blackColor,
                         ),
                         decoration: InputDecoration(
                           prefixIconConstraints: BoxConstraints(

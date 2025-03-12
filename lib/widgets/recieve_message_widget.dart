@@ -28,7 +28,7 @@ class RecieveMessageWidget extends StatelessWidget {
               "Уже сделал?",
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.chatTextDarkGreen,
+                color: AppColors.black,
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w500,
               ),
@@ -38,7 +38,7 @@ class RecieveMessageWidget extends StatelessWidget {
               formattedTime,
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.chatTextDarkGreen,
+                color: AppColors.black,
                 fontFamily: "Gilroy",
                 fontWeight: FontWeight.w500,
               ),

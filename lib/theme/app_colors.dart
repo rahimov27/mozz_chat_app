@@ -19,4 +19,7 @@ abstract class AppColors {
   // chat green color
   static const chatGreen = Color(0xff3CED78);
   static const chatTextDarkGreen = Color(0xff00521C);
+
+
+  
 }
