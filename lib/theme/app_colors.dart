@@ -11,4 +11,8 @@ abstract class AppColors {
   // circle colors
   static const green1 = Color(0xff1FDB5F);
   static const green2 = Color(0xff31C764);
+
+  // circle colors
+  static const red1 = Color(0xffF66700);
+  static const red2 = Color(0xffED3900);
 }

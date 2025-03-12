@@ -4,10 +4,14 @@ import 'package:mozz_chat_app/theme/app_colors.dart';
 class AppCircleWidget extends StatelessWidget {
   final String firstName;
   final String lastName;
+  final Color color1;
+  final Color color2;
   const AppCircleWidget({
     super.key,
     required this.firstName,
     required this.lastName,
+    required this.color1,
+    required this.color2
   });
 
   @override
@@ -20,7 +24,7 @@ class AppCircleWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-              colors: [AppColors.green1, AppColors.green2],
+              colors: [color1, color2],
             ),
           ),
           child: Align(

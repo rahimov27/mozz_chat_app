@@ -6,11 +6,14 @@ class AppChatWidgetRow extends StatelessWidget {
   final String firstName;
   final String lastName;
   final String date;
+  final Color color1;
+  final Color color2;
   const AppChatWidgetRow({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.date,
+    required this.color1, required this.color2
   });
 
   @override
@@ -32,7 +35,12 @@ class AppChatWidgetRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      AppCircleWidget(firstName: firstName, lastName: lastName),
+                      AppCircleWidget(
+                        firstName: firstName,
+                        lastName: lastName,
+                        color1: color1,
+                        color2: color2,
+                      ),
                       SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
