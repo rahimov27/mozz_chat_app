@@ -5,7 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class SendedMessageWidget extends StatelessWidget {
-  SendedMessageWidget({super.key, required this.formattedTime});
+  final String message;
+  SendedMessageWidget({
+    super.key,
+    required this.formattedTime,
+    required this.message,
+  });
 
   final String formattedTime;
   final DateTime date = DateTime.now();
@@ -53,7 +58,7 @@ class SendedMessageWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Уже сделал?",
+                  message,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.chatTextDarkGreen,
@@ -72,6 +77,7 @@ class SendedMessageWidget extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 4),
+
                 SvgPicture.asset("assets/svg/read.svg"),
               ],
             ),
