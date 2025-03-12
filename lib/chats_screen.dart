@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
+import 'package:mozz_chat_app/widgets/app_bar_title_widget.dart';
 import 'package:mozz_chat_app/widgets/app_chat_widget_row.dart';
 import 'package:mozz_chat_app/widgets/app_search_field_widget.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
+class ChatsScreen extends StatelessWidget {
+  const ChatsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Чаты",
-          style: TextStyle(
-            fontSize: 32,
-            fontFamily: "Gilroy-bold",
-            letterSpacing: 0,
-            color: AppColors.black,
-          ),
-        ),
+        title: AppBarTitleWidget(),
         centerTitle: false,
       ),
       body: SafeArea(
@@ -49,8 +42,8 @@ class App extends StatelessWidget {
               color2: AppColors.green2,
             ),
             AppChatWidgetRow(
-              firstName: "Пётр",
-              lastName: "Жаринов",
+              firstName: "Алина",
+              lastName: "Жукова",
               date: "09:23",
               color1: AppColors.red1,
               color2: AppColors.red2,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mozz_chat_app/app.dart';
+import 'package:mozz_chat_app/chats_screen.dart';
 import 'package:mozz_chat_app/theme/theme.dart';
 
 void main() {
@@ -11,6 +11,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: App(), theme: theme);
+    return MaterialApp(home: ChatsScreen(), theme: theme);
   }
 }
