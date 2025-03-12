@@ -77,12 +77,12 @@ class SendedMessageWidget extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 4),
-
                 SvgPicture.asset("assets/svg/read.svg"),
               ],
             ),
           ),
         ),
+        SizedBox(height: 30),
       ],
     );
   }

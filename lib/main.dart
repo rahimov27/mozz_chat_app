@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
 import 'package:mozz_chat_app/chats_screen.dart';
 import 'package:mozz_chat_app/theme/theme.dart';
 
@@ -11,6 +13,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ChatsScreen(), theme: theme);
+    return BlocProvider(
+      create: (context) => SendBloc(),
+      child: MaterialApp(home: ChatsScreen(), theme: theme),
+    );
   }
 }

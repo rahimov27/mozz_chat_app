@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
+import 'package:mozz_chat_app/bloc/send_message_bloc/send_event.dart';
+import 'package:mozz_chat_app/bloc/send_message_bloc/send_state.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 import 'package:mozz_chat_app/widgets/chat_app_bar_widget.dart';
-import 'package:mozz_chat_app/widgets/recieve_message_widget.dart';
 import 'package:mozz_chat_app/widgets/sended_message_widget.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -24,30 +27,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  // Controller of message
   final TextEditingController messageController = TextEditingController();
-
-  // Messages list
   final List<Map<String, String>> messages = [];
 
-  // Function to adding a message
-  void _sendMessage(String message) {
-    if (message.trim().isEmpty) return;
-
-    setState(() {
-      messages.add({
-        "time": DateFormat('HH:mm').format(DateTime.now()),
-        "message": message,
-      });
-      messageController.clear();
-    });
-  }
+  final ScrollController _scrollContrller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    final time = DateTime.now();
-    final formattedTime = DateFormat('HH:mm').format(time);
-
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 0,
@@ -63,25 +49,40 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             Divider(color: AppColors.textFieldColor),
-            Spacer(),
-            // Sended message here
             Expanded(
-              child: ListView.builder(
-                itemCount: messages.length,
-                itemBuilder: (context, int index) {
-                  final msg = messages[index];
-                  return SendedMessageWidget(
-                    formattedTime: msg['time']!,
-                    message: msg['message']!,
+              child: BlocConsumer<SendBloc, SendState>(
+                listener: (context, state) {
+                  if (state is SendMessageSuccess) {
+                    setState(() {
+                      messages.add({
+                        "time": DateFormat('HH:mm').format(DateTime.now()),
+                        "message": state.successMessage,
+                      });
+                      // автоматическая прокрутка вниз
+                      _scrollToBottom();
+                    });
+                  } else if (state is SendMessageError) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.error)));
+                  }
+                },
+                builder: (context, state) {
+                  return ListView.builder(
+                    controller: _scrollContrller,
+                    reverse: false,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = messages[index];
+                      return SendedMessageWidget(
+                        formattedTime: msg['time']!,
+                        message: msg['message']!,
+                      );
+                    },
                   );
                 },
               ),
             ),
-            Spacer(),
-            RecieveMessageWidget(formattedTime: formattedTime),
-            Spacer(),
-
-            // Textfield part
             Padding(
               padding: const EdgeInsets.only(bottom: 23, left: 20, right: 20),
               child: Row(
@@ -106,7 +107,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: TextField(
                         cursorColor: AppColors.gray,
                         onSubmitted: (value) {
-                          _sendMessage(value);
+                          if (value.trim().isNotEmpty) {
+                            context.read<SendBloc>().add(
+                              SendMessageEvent(message: value),
+                            );
+                            messageController.clear();
+                          }
                         },
                         controller: messageController,
                         style: TextStyle(
@@ -116,10 +122,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: AppColors.blackColor,
                         ),
                         decoration: InputDecoration(
-                          prefixIconConstraints: BoxConstraints(
-                            minWidth: 0,
-                            minHeight: 0,
-                          ),
                           contentPadding: EdgeInsets.only(left: 12),
                           hintText: "Сообщение",
                           hintStyle: TextStyle(
@@ -160,5 +162,12 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  void _scrollToBottom() {
+    if (_scrollContrller.hasClients) {
+      // Прокручиваем вниз при добавлении нового сообщения
+      _scrollContrller.jumpTo(_scrollContrller.position.maxScrollExtent);
+    }
   }
 }
