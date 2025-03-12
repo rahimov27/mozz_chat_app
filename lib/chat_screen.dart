@@ -37,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 0,
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: ChatAppBarWidget(
           firstName: widget.firstName,
@@ -54,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 listener: (context, state) {
                   if (state is SendMessageSuccess) {
                     setState(() {
-                      messages.add({
+                      messages.insert(0, {
                         "time": DateFormat('HH:mm').format(DateTime.now()),
                         "message": state.successMessage,
                       });
@@ -70,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 builder: (context, state) {
                   return ListView.builder(
                     controller: _scrollContrller,
-                    reverse: false,
+                    reverse: true,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
@@ -83,8 +84,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
+            Divider(color: AppColors.textFieldColor),
             Padding(
-              padding: const EdgeInsets.only(bottom: 23, left: 20, right: 20),
+              padding: const EdgeInsets.only(
+                bottom: 23,
+                left: 20,
+                right: 20,
+                top: 14,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,9 +172,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    if (_scrollContrller.hasClients) {
-      // Прокручиваем вниз при добавлении нового сообщения
-      _scrollContrller.jumpTo(_scrollContrller.position.maxScrollExtent);
-    }
+    Future.delayed(Duration(milliseconds: 300), () {
+      if (_scrollContrller.hasClients) {
+        _scrollContrller.jumpTo(_scrollContrller.position.minScrollExtent);
+      }
+    });
   }
 }

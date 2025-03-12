@@ -44,7 +44,7 @@ class SendedMessageWidget extends StatelessWidget {
         SizedBox(height: 20),
         ChatBubble(
           margin: EdgeInsets.only(right: 20),
-          alignment: Alignment.topRight,
+          alignment: Alignment.bottomRight,
           shadowColor: Colors.transparent,
           clipper: ChatBubbleClipper2(
             type: BubbleType.sendBubble,
