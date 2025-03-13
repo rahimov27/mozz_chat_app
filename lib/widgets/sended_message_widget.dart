@@ -11,7 +11,7 @@ class SendedMessageWidget extends StatelessWidget {
   final bool isImage;
   final String? imagePath;
 
-  SendedMessageWidget({
+  const SendedMessageWidget({
     super.key,
     required this.formattedTime,
     required this.message,
@@ -46,6 +46,7 @@ class SendedMessageWidget extends StatelessWidget {
         ),
         SizedBox(height: 20),
         ChatBubble(
+          padding: isImage ? EdgeInsets.only(top: 4, right: 14) : null,
           margin: EdgeInsets.only(right: 20),
           alignment: Alignment.bottomRight,
           shadowColor: Colors.transparent,
@@ -58,10 +59,16 @@ class SendedMessageWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(left: 6, right: 6),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (isImage)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(19),
+                      topLeft: Radius.circular(19),
+                      bottomLeft: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
                     child: Image.file(
                       File(imagePath!),
                       width: 274,
@@ -74,37 +81,96 @@ class SendedMessageWidget extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              message,
-                              style: TextStyle(
-                                overflow: TextOverflow.visible,
-                                fontSize: 14,
-                                color: AppColors.chatTextDarkGreen,
-                                fontFamily: "Gilroy",
-                                fontWeight: FontWeight.w500,
+                      isImage
+                          ? Padding(
+                            padding: const EdgeInsets.only(left: 12, bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Padding(
+                                    padding:
+                                        isImage
+                                            ? const EdgeInsets.only(top: 8)
+                                            : EdgeInsets.all(0),
+                                    child: Text(
+                                      textAlign: TextAlign.end,
+                                      message,
+                                      style: TextStyle(
+                                        overflow: TextOverflow.visible,
+                                        fontSize: 14,
+                                        color: AppColors.chatTextDarkGreen,
+                                        fontFamily: "Gilroy",
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  formattedTime,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.chatTextDarkGreen,
+                                    fontFamily: "Gilroy",
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 2),
+                                  child: SvgPicture.asset(
+                                    "assets/svg/read.svg",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          : Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Padding(
+                                  padding:
+                                      isImage
+                                          ? const EdgeInsets.only(top: 8)
+                                          : EdgeInsets.all(0),
+                                  child: Text(
+                                    textAlign: TextAlign.end,
+                                    message,
+                                    style: TextStyle(
+                                      overflow: TextOverflow.visible,
+                                      fontSize: 14,
+                                      color: AppColors.chatTextDarkGreen,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
                               ),
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                            ),
+                              SizedBox(width: 12),
+                              Text(
+                                formattedTime,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.chatTextDarkGreen,
+                                  fontFamily: "Gilroy",
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 2),
+                                child: SvgPicture.asset("assets/svg/read.svg"),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 12),
-                          Text(
-                            formattedTime,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.chatTextDarkGreen,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          SvgPicture.asset("assets/svg/read.svg"),
-                        ],
-                      ),
                     ],
                   ),
                 ),
