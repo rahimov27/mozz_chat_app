@@ -12,6 +12,7 @@ class AppSearchFieldWidget extends StatelessWidget {
       child: SizedBox(
         height: 42,
         child: TextField(
+          cursorColor: AppColors.gray,
           style: TextStyle(
             fontSize: 16,
             fontFamily: "Gilroy",

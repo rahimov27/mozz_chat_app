@@ -16,6 +16,7 @@ dependencies:
   flutter_chat_bubble: ^2.0.2
   bloc: ^8.0.3
   flutter_bloc: ^8.0.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

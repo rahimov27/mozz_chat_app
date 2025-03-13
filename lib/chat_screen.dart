@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
 import 'package:mozz_chat_app/bloc/send_message_bloc/send_event.dart';
@@ -14,6 +15,7 @@ class ChatScreen extends StatefulWidget {
   final String lastName;
   final Color color1;
   final Color color2;
+
   const ChatScreen({
     super.key,
     required this.firstName,
@@ -29,8 +31,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   final List<Map<String, String>> messages = [];
-
   final ScrollController _scrollContrller = ScrollController();
+  String? _imagePath; // Переменная для хранения пути к изображению
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +60,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       messages.insert(0, {
                         "time": DateFormat('HH:mm').format(DateTime.now()),
                         "message": state.successMessage,
+                        "imagePath":
+                            state.imagePath ?? "", // Если есть путь к фото
                       });
-                      // автоматическая прокрутка вниз
                       _scrollToBottom();
                     });
                   } else if (state is SendMessageError) {
@@ -78,6 +81,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       return SendedMessageWidget(
                         formattedTime: msg['time']!,
                         message: msg['message']!,
+                        isImage: msg['imagePath']!.isNotEmpty,
+                        imagePath:
+                            msg['imagePath']!, // Передаем путь к изображению
                       );
                     },
                   );
@@ -96,14 +102,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.textFieldColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(9.0),
-                      child: SvgPicture.asset("assets/svg/attach.svg"),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.textFieldColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(9.0),
+                        child: SvgPicture.asset("assets/svg/attach.svg"),
+                      ),
                     ),
                   ),
                   SizedBox(width: 8),
@@ -114,11 +123,21 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: TextField(
                         cursorColor: AppColors.gray,
                         onSubmitted: (value) {
-                          if (value.trim().isNotEmpty) {
+                          if (value.trim().isNotEmpty || _imagePath != null) {
+                            final message =
+                                value.isNotEmpty
+                                    ? value
+                                    : "Фото"; // Использовать описание, если оно есть
                             context.read<SendBloc>().add(
-                              SendMessageEvent(message: value),
+                              SendMessageEvent(
+                                message: message,
+                                imagePath: _imagePath,
+                              ),
                             );
                             messageController.clear();
+                            setState(() {
+                              _imagePath = null; // Сбросить путь после отправки
+                            });
                           }
                         },
                         controller: messageController,
@@ -169,6 +188,17 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  void _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path; // Сохраняем путь к выбранному изображению
+      });
+    }
   }
 
   void _scrollToBottom() {
