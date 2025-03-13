@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
-import 'package:mozz_chat_app/bloc/send_message_bloc/send_event.dart';
-import 'package:mozz_chat_app/bloc/send_message_bloc/send_state.dart';
+import 'package:mozz_chat_app/message_model.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 import 'package:mozz_chat_app/widgets/chat_app_bar_widget.dart';
 import 'package:mozz_chat_app/widgets/sended_message_widget.dart';
@@ -29,6 +27,33 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  // Messages part
+  var box = Hive.box<Message>('messages');
+
+  // save message into box
+  void saveMessage(String message, String? imagePath) {
+    var box = Hive.box<Message>('messages');
+    final key = DateTime.now().millisecondsSinceEpoch.toString();
+    final newMessage = Message(
+      text: message,
+      timeStamp: DateFormat('HH:mm').format(DateTime.now()),
+      imagePath: imagePath,
+    );
+
+    box.put(key, newMessage);
+    print("Saved message: $message at $key");
+
+    // После сохранения сообщения, прокручиваем список вниз
+    _scrollToBottom();
+  }
+
+  // get messages
+
+  List<Message> getMessages() {
+    var box = Hive.box<Message>('messages');
+    return box.values.toList();
+  }
+
   final TextEditingController messageController = TextEditingController();
   final List<Map<String, String>> messages = [];
   final ScrollController _scrollContrller = ScrollController();
@@ -53,37 +78,22 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Divider(color: AppColors.textFieldColor),
             Expanded(
-              child: BlocConsumer<SendBloc, SendState>(
-                listener: (context, state) {
-                  if (state is SendMessageSuccess) {
-                    setState(() {
-                      messages.insert(0, {
-                        "time": DateFormat('HH:mm').format(DateTime.now()),
-                        "message": state.successMessage,
-                        "imagePath":
-                            state.imagePath ?? "", // Если есть путь к фото
-                      });
-                      _scrollToBottom();
-                    });
-                  } else if (state is SendMessageError) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(state.error)));
-                  }
-                },
-                builder: (context, state) {
+              child: ValueListenableBuilder(
+                valueListenable: Hive.box<Message>('messages').listenable(),
+                builder: (context, Box<Message> box, _) {
                   return ListView.builder(
                     controller: _scrollContrller,
-                    reverse: true,
-                    itemCount: messages.length,
+                    reverse: false,
+                    itemCount: box.values.length,
                     itemBuilder: (context, index) {
-                      final msg = messages[index];
+                      final msg = box.getAt(index);
+                      if (msg == null) return SizedBox.shrink();
                       return SendedMessageWidget(
-                        formattedTime: msg['time']!,
-                        message: msg['message']!,
-                        isImage: msg['imagePath']!.isNotEmpty,
-                        imagePath:
-                            msg['imagePath']!, // Передаем путь к изображению
+                        formattedTime: msg.timeStamp,
+                        message: msg.text,
+                        isImage:
+                            msg.imagePath != null && msg.imagePath!.isNotEmpty,
+                        imagePath: msg.imagePath,
                       );
                     },
                   );
@@ -123,23 +133,33 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: TextField(
                         cursorColor: AppColors.gray,
                         onSubmitted: (value) {
-                          if (value.trim().isNotEmpty || _imagePath != null) {
-                            final message =
-                                value.isNotEmpty
-                                    ? value
-                                    : "Фото"; // Использовать описание, если оно есть
-                            context.read<SendBloc>().add(
-                              SendMessageEvent(
-                                message: message,
-                                imagePath: _imagePath,
-                              ),
-                            );
-                            messageController.clear();
-                            setState(() {
-                              _imagePath = null; // Сбросить путь после отправки
-                            });
-                          }
+                          saveMessage(messageController.text, _imagePath);
+                          print(
+                            "Отправлено сообщение: ${messageController.text}",
+                          );
+                          messageController.clear(); // Очистка поля ввода
+                          setState(() {
+                            _imagePath = null; // Очистка пути изображения
+                          });
                         },
+                        // onSubmitted: (value) {
+                        //   if (value.trim().isNotEmpty || _imagePath != null) {
+                        //     final message =
+                        //         value.isNotEmpty
+                        //             ? value
+                        //             : "Фото"; // Использовать описание, если оно есть
+                        //     context.read<SendBloc>().add(
+                        //       SendMessageEvent(
+                        //         message: message,
+                        //         imagePath: _imagePath,
+                        //       ),
+                        //     );
+                        //     messageController.clear();
+                        //     setState(() {
+                        //       _imagePath = null; // Сбросить путь после отправки
+                        //     });
+                        //   }
+                        // },
                         controller: messageController,
                         style: TextStyle(
                           fontSize: 16,
@@ -202,9 +222,13 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    Future.delayed(Duration(milliseconds: 300), () {
+    Future.delayed(Duration(milliseconds: 100), () {
       if (_scrollContrller.hasClients) {
-        _scrollContrller.jumpTo(_scrollContrller.position.minScrollExtent);
+        _scrollContrller.animateTo(
+          _scrollContrller.position.maxScrollExtent,
+          duration: Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
