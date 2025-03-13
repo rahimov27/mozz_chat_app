@@ -69,33 +69,44 @@ class SendedMessageWidget extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      message,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.chatTextDarkGreen,
-                        fontFamily: "Gilroy",
-                        fontWeight: FontWeight.w500,
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 282),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              message,
+                              style: TextStyle(
+                                overflow: TextOverflow.visible,
+                                fontSize: 14,
+                                color: AppColors.chatTextDarkGreen,
+                                fontFamily: "Gilroy",
+                                fontWeight: FontWeight.w500,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            formattedTime,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.chatTextDarkGreen,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          SvgPicture.asset("assets/svg/read.svg"),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    SizedBox(width: 12),
-                    Text(
-                      formattedTime,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.chatTextDarkGreen,
-                        fontFamily: "Gilroy",
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    SvgPicture.asset("assets/svg/read.svg"),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
