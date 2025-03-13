@@ -6,8 +6,16 @@ class SendBloc extends Bloc<SendEvent, SendState> {
   SendBloc() : super(SendMessageInitial()) {
     on<SendMessageEvent>((event, emit) async {
       emit(SendMessageLoading());
+      emit(SendMessageSuccess(successMessage: event.message, isImage: false));
+    });
 
-      emit(SendMessageSuccess(successMessage: event.message));
+    on<SendImageEvent>((event, emit) {
+      try {
+        // Send the image path as the successMessage for image messages
+        emit(SendMessageSuccess(successMessage: event.imagePath, isImage: true));
+      } catch (e) {
+        emit(SendMessageError(error: "Ошибка при загрузке фото"));
+      }
     });
   }
 }

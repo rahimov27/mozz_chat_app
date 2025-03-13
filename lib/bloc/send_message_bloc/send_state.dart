@@ -5,8 +5,10 @@ class SendMessageInitial extends SendState {}
 class SendMessageLoading extends SendState {}
 
 class SendMessageSuccess extends SendState {
-  final String successMessage;
-  SendMessageSuccess({required this.successMessage});
+  final dynamic successMessage;
+  final bool isImage;
+
+  SendMessageSuccess({required this.successMessage, this.isImage = false});
 }
 
 class SendMessageError extends SendState {

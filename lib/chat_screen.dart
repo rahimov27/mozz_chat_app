@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
 import 'package:mozz_chat_app/bloc/send_message_bloc/send_event.dart';
@@ -14,6 +16,7 @@ class ChatScreen extends StatefulWidget {
   final String lastName;
   final Color color1;
   final Color color2;
+
   const ChatScreen({
     super.key,
     required this.firstName,
@@ -29,7 +32,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   final List<Map<String, String>> messages = [];
-
   final ScrollController _scrollContrller = ScrollController();
 
   @override
@@ -59,7 +61,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         "time": DateFormat('HH:mm').format(DateTime.now()),
                         "message": state.successMessage,
                       });
-                      // автоматическая прокрутка вниз
                       _scrollToBottom();
                     });
                   } else if (state is SendMessageError) {
@@ -78,6 +79,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       return SendedMessageWidget(
                         formattedTime: msg['time']!,
                         message: msg['message']!,
+                        isImage:
+                            msg['message']!.endsWith('.jpg') ||
+                            msg['message']!.endsWith('.png'),
+                        imagePath: msg['message']!, // Pass the image path here
                       );
                     },
                   );
@@ -96,14 +101,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.textFieldColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(9.0),
-                      child: SvgPicture.asset("assets/svg/attach.svg"),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.textFieldColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(9.0),
+                        child: SvgPicture.asset("assets/svg/attach.svg"),
+                      ),
                     ),
                   ),
                   SizedBox(width: 8),
@@ -171,6 +179,18 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  // function to pick image
+  void _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // Pass the image path (string) to the SendImageEvent
+      context.read<SendBloc>().add(SendImageEvent(imagePath: pickedFile.path));
+    }
+  }
+
+  // function to scroll automatically
   void _scrollToBottom() {
     Future.delayed(Duration(milliseconds: 300), () {
       if (_scrollContrller.hasClients) {
