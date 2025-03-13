@@ -7,7 +7,7 @@ import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class SendedMessageWidget extends StatelessWidget {
   final String message;
-  final formateDate = DateFormat('dd:MM.yy').format(DateTime.now());
+  final String formattedTime;
   final bool isImage;
   final String? imagePath;
 
@@ -16,10 +16,8 @@ class SendedMessageWidget extends StatelessWidget {
     required this.formattedTime,
     required this.message,
     required this.isImage,
-    required this.imagePath,
+    this.imagePath,
   });
-
-  final String formattedTime;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +31,7 @@ class SendedMessageWidget extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
-                  formateDate,
+                  DateFormat('dd:MM.yy').format(DateTime.now()),
                   style: TextStyle(
                     fontFamily: "Gilroy",
                     color: AppColors.gray,
@@ -49,7 +47,6 @@ class SendedMessageWidget extends StatelessWidget {
         SizedBox(height: 20),
         ChatBubble(
           margin: EdgeInsets.only(right: 20),
-          // padding: EdgeInsets.all(10),
           alignment: Alignment.bottomRight,
           shadowColor: Colors.transparent,
           clipper: ChatBubbleClipper2(
@@ -58,51 +55,51 @@ class SendedMessageWidget extends StatelessWidget {
             nipRadius: 0,
           ),
           backGroundColor: AppColors.chatGreen,
-          child:
-              isImage
-                  ? ClipRRect(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 6, right: 6),
+            child: Column(
+              children: [
+                if (isImage)
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.file(
                       File(imagePath!),
-                      width: 274, // Set width limit
-                      height: 160, // Set height limit
-                      fit: BoxFit.cover, // Ensure the image scales correctly
-                    ),
-                  )
-                  : Padding(
-                    padding: const EdgeInsets.only(left: 6, right: 6),
-                    child: Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            message,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.chatTextDarkGreen,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow:
-                                TextOverflow.ellipsis, // For text truncation
-                            maxLines: 1,
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            formattedTime,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.chatTextDarkGreen,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          SvgPicture.asset("assets/svg/read.svg"),
-                        ],
-                      ),
+                      width: 274,
+                      height: 160,
+                      fit: BoxFit.cover,
                     ),
                   ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      message,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.chatTextDarkGreen,
+                        fontFamily: "Gilroy",
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      formattedTime,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.chatTextDarkGreen,
+                        fontFamily: "Gilroy",
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    SvgPicture.asset("assets/svg/read.svg"),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
         SizedBox(height: 30),
       ],
