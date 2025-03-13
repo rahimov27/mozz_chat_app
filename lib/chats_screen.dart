@@ -65,10 +65,17 @@ class _ChatsScreenState extends State<ChatsScreen> {
   void _filterChats() {
     String query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredChats = chats.where((chat) {
-        return chat.firstName.toLowerCase().contains(query) ||
-            chat.lastName.toLowerCase().contains(query);
-      }).toList();
+      _filteredChats =
+          chats.where((chat) {
+            return chat.firstName.toLowerCase().contains(query) ||
+                chat.lastName.toLowerCase().contains(query);
+          }).toList();
+    });
+  }
+
+  void _deleteChat(int index) {
+    setState(() {
+      _filteredChats.removeAt(index);
     });
   }
 
@@ -86,26 +93,43 @@ class _ChatsScreenState extends State<ChatsScreen> {
               child: ListView.builder(
                 itemCount: _filteredChats.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                  return Dismissible(
+                    key: Key(_filteredChats[index].firstName),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      _deleteChat(index);
+                      ScaffoldMessenger.of(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                            firstName: _filteredChats[index].firstName,
-                            lastName: _filteredChats[index].lastName,
-                            color1: _filteredChats[index].color1,
-                            color2: _filteredChats[index].color2,
-                          ),
-                        ),
-                      );
+                      ).showSnackBar(SnackBar(content: Text("Delete")));
                     },
-                    child: AppChatWidgetRow(
-                      firstName: _filteredChats[index].firstName,
-                      lastName: _filteredChats[index].lastName,
-                      date: _filteredChats[index].date,
-                      color1: _filteredChats[index].color1,
-                      color2: _filteredChats[index].color2,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => ChatScreen(
+                                  firstName: _filteredChats[index].firstName,
+                                  lastName: _filteredChats[index].lastName,
+                                  color1: _filteredChats[index].color1,
+                                  color2: _filteredChats[index].color2,
+                                ),
+                          ),
+                        );
+                      },
+                      child: AppChatWidgetRow(
+                        firstName: _filteredChats[index].firstName,
+                        lastName: _filteredChats[index].lastName,
+                        date: _filteredChats[index].date,
+                        color1: _filteredChats[index].color1,
+                        color2: _filteredChats[index].color2,
+                      ),
                     ),
                   );
                 },
