@@ -3,7 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class AppSearchFieldWidget extends StatelessWidget {
-  const AppSearchFieldWidget({super.key});
+  final TextEditingController controller;
+
+  const AppSearchFieldWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +14,7 @@ class AppSearchFieldWidget extends StatelessWidget {
       child: SizedBox(
         height: 42,
         child: TextField(
+          controller: controller, // добавлен контроллер
           cursorColor: AppColors.gray,
           style: TextStyle(
             fontSize: 16,
