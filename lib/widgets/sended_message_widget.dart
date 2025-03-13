@@ -57,7 +57,10 @@ class SendedMessageWidget extends StatelessWidget {
           ),
           backGroundColor: AppColors.chatGreen,
           child: Padding(
-            padding: const EdgeInsets.only(left: 6, right: 6),
+            padding:
+                isImage
+                    ? const EdgeInsets.only(left: 6, right: 0)
+                    : EdgeInsets.only(left: 6, right: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -82,34 +85,38 @@ class SendedMessageWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       isImage
-                          ? Padding(
-                            padding: const EdgeInsets.only(left: 12, bottom: 8),
+                          ? Align(
+                            alignment: Alignment.centerRight,
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Flexible(
-                                  child: Padding(
-                                    padding:
-                                        isImage
-                                            ? const EdgeInsets.only(top: 8)
-                                            : EdgeInsets.all(0),
-                                    child: Text(
-                                      textAlign: TextAlign.end,
-                                      message,
-                                      style: TextStyle(
-                                        overflow: TextOverflow.visible,
-                                        fontSize: 14,
-                                        color: AppColors.chatTextDarkGreen,
-                                        fontFamily: "Gilroy",
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      softWrap: true,
+                                Padding(
+                                  padding:
+                                      isImage
+                                          ? const EdgeInsets.only(
+                                            top: 8,
+                                            left: 10,
+                                            bottom: 6,
+                                            right: 4,
+                                          )
+                                          : EdgeInsets.all(0),
+                                  child: Text(
+                                    textAlign: TextAlign.end,
+                                    message,
+                                    style: TextStyle(
                                       overflow: TextOverflow.visible,
+                                      fontSize: 14,
+                                      color: AppColors.chatTextDarkGreen,
+                                      fontFamily: "Gilroy",
+                                      fontWeight: FontWeight.w500,
                                     ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
                                   ),
                                 ),
                                 SizedBox(width: 12),
+                                Spacer(),
                                 Text(
                                   formattedTime,
                                   style: TextStyle(
@@ -121,7 +128,10 @@ class SendedMessageWidget extends StatelessWidget {
                                 ),
                                 SizedBox(width: 4),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 2),
+                                  padding: const EdgeInsets.only(
+                                    bottom: 2,
+                                    right: 10,
+                                  ),
                                   child: SvgPicture.asset(
                                     "assets/svg/read.svg",
                                   ),

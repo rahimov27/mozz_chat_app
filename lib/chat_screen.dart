@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:mozz_chat_app/bloc/send_message_bloc/send_bloc.dart';
-import 'package:mozz_chat_app/bloc/send_message_bloc/send_event.dart';
 import 'package:mozz_chat_app/message_model.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 import 'package:mozz_chat_app/widgets/chat_app_bar_widget.dart';
