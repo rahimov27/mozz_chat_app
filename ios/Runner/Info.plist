@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Приложению нужен доступ к камере для отправки фото</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Приложению нужен доступ к галерее для отправки фото</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Приложение должно сохранять фото в галерее</string>
 </dict>
 </plist>
