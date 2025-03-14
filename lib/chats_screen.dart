@@ -170,8 +170,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
                       builder: (context, snapshot) {
                         final lastMessage = snapshot.data;
                         return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder:
@@ -180,9 +180,13 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                       lastName: chat.lastName,
                                       color1: chat.color1,
                                       color2: chat.color2,
+                                      onReturn: () {
+                                        setState(() {});
+                                      },
                                     ),
                               ),
                             );
+                            setState(() {});
                           },
                           child: AppChatWidgetRow(
                             message: lastMessage?.text ?? "Нет сообщений",

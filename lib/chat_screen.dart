@@ -15,6 +15,7 @@ class ChatScreen extends StatefulWidget {
   final String lastName;
   final Color color1;
   final Color color2;
+  final VoidCallback? onReturn;
 
   const ChatScreen({
     super.key,
@@ -22,6 +23,7 @@ class ChatScreen extends StatefulWidget {
     required this.lastName,
     required this.color1,
     required this.color2,
+    this.onReturn,
   });
 
   @override
@@ -56,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void saveMessage(String message, String? imagePath) {
+  void saveMessage(String message, String? imagePath) async {
     final key = DateTime.now().millisecondsSinceEpoch.toString();
     final newMessage = Message(
       text: message,
@@ -64,12 +66,16 @@ class _ChatScreenState extends State<ChatScreen> {
       imagePath: imagePath,
     );
 
-    chatBox.put(key, newMessage);
+    await chatBox.put(key, newMessage);
+    await chatBox.flush(); // Синхронизируем данные с диском
     messageController.clear();
     setState(() {
       _imagePath = null;
     });
     _scrollToBottom();
+
+    // Вызываем колбэк после сохранения сообщения
+    widget.onReturn?.call();
   }
 
   void _scrollToBottom() {
@@ -93,6 +99,12 @@ class _ChatScreenState extends State<ChatScreen> {
         _imagePath = pickedFile.path;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    widget.onReturn?.call(); // Вызываем колбэк при закрытии экрана
+    super.dispose();
   }
 
   Map<String, List<Message>> groupMessagesByDate(List<Message> messages) {
@@ -120,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final groupedMessages = groupMessagesByDate(chatBox.values.toList());
+    groupMessagesByDate(chatBox.values.toList());
 
     return Scaffold(
       appBar: AppBar(
