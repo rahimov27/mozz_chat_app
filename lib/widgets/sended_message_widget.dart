@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:mozz_chat_app/message_model.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class SendedMessageWidget extends StatelessWidget {
@@ -12,6 +10,8 @@ class SendedMessageWidget extends StatelessWidget {
   final String formattedTime;
   final bool isImage;
   final String? imagePath;
+  final String messageKey;
+  final Function(String) onDelete;
 
   const SendedMessageWidget({
     super.key,
@@ -19,6 +19,8 @@ class SendedMessageWidget extends StatelessWidget {
     required this.message,
     required this.isImage,
     this.imagePath,
+    required this.messageKey,
+    required this.onDelete,
   });
 
   @override
@@ -48,14 +50,7 @@ class SendedMessageWidget extends StatelessWidget {
         ),
         SizedBox(height: 20),
         GestureDetector(
-          onLongPress: () {
-            var box = Hive.box<Message>('chats');
-
-            if (box.isNotEmpty) {
-              var lastKey = box.keys.last;
-              box.delete(lastKey);
-            }
-          },
+          onLongPress: () => onDelete(messageKey),
           child: ChatBubble(
             padding: isImage ? EdgeInsets.only(top: 4, right: 14) : null,
             margin: EdgeInsets.only(right: 20),

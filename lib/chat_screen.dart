@@ -125,6 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: _scrollController,
                     itemCount: box.values.length,
                     itemBuilder: (context, index) {
+                      final key = box.keys.elementAt(index);
                       final msg = box.getAt(index);
                       if (msg == null) return SizedBox.shrink();
                       return SendedMessageWidget(
@@ -132,6 +133,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         message: msg.text,
                         isImage: msg.imagePath != null,
                         imagePath: msg.imagePath,
+                        messageKey: key,
+                        onDelete: (key) {
+                          box.delete(key);
+                          setState(() {});
+                        },
                       );
                     },
                   );
