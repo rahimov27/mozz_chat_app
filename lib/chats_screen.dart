@@ -180,9 +180,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                       lastName: chat.lastName,
                                       color1: chat.color1,
                                       color2: chat.color2,
-                                      onReturn: () {
-                                        setState(() {});
-                                      },
+                                      onReturn: () {},
                                     ),
                               ),
                             );
