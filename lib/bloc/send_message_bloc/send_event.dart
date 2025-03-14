@@ -2,11 +2,11 @@ abstract class SendEvent {}
 
 class SendMessageEvent extends SendEvent {
   final String message;
-  final String? imagePath; // Опциональное поле для пути к изображению
+  final String? imagePath;
   SendMessageEvent({required this.message, this.imagePath});
 }
 
 class SendImageEvent extends SendEvent {
-  final String imagePath; // Передаем путь к изображению
+  final String imagePath;
   SendImageEvent({required this.imagePath});
 }

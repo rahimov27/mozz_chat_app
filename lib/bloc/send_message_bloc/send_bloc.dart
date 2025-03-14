@@ -8,18 +8,25 @@ class SendBloc extends Bloc<SendEvent, SendState> {
       emit(SendMessageLoading());
 
       if (event.imagePath != null) {
-        // Если изображение есть, отправляем сообщение с картинкой
-        emit(SendMessageSuccess(successMessage: event.message, isImage: true, imagePath: event.imagePath));
+        // if image present, send our message with image
+        emit(
+          SendMessageSuccess(
+            successMessage: event.message,
+            isImage: true,
+            imagePath: event.imagePath,
+          ),
+        );
       } else {
-        // Если нет картинки, просто отправляем текстовое сообщение
+        // if we don't have image, just send the message
         emit(SendMessageSuccess(successMessage: event.message, isImage: false));
       }
     });
 
     on<SendImageEvent>((event, emit) {
       try {
-        // Обработка изображения, если нужно
-        emit(SendMessageSuccess(successMessage: event.imagePath, isImage: true));
+        emit(
+          SendMessageSuccess(successMessage: event.imagePath, isImage: true),
+        );
       } catch (e) {
         emit(SendMessageError(error: "Ошибка при загрузке фото"));
       }
