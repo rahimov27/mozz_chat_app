@@ -1,4 +1,5 @@
 import 'dart:convert';
+// ignore: depend_on_referenced_packages
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -228,7 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 setState(() {});
                               },
                             );
-                          }).toList(),
+                          }),
                         ],
                       );
                     },

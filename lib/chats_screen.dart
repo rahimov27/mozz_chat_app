@@ -1,4 +1,5 @@
 import 'dart:convert';
+// ignore: depend_on_referenced_packages
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -129,6 +130,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     });
 
     // show our Snackbar when we delete the chat
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Чат с ${chat.firstName} ${chat.lastName} удален"),
@@ -169,16 +171,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
                   final chat = filteredChats[index];
                   final chatId = getChatId(chat.firstName, chat.lastName);
                   return Dismissible(
-                    key: Key(chatId), 
-                    direction: DismissDirection.endToStart, 
+                    key: Key(chatId),
+                    direction: DismissDirection.endToStart,
                     background: Container(
-                      color: Colors.red, 
+                      color: Colors.red,
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Icon(Icons.delete, color: Colors.white),
                     ),
                     onDismissed: (direction) {
-                      _deleteChat(index); 
+                      _deleteChat(index);
                     },
                     child: FutureBuilder<Message?>(
                       future: getLastMessage(chatId),
