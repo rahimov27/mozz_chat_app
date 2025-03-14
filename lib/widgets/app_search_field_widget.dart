@@ -4,8 +4,13 @@ import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class AppSearchFieldWidget extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode focusNode; // Добавлен FocusNode
 
-  const AppSearchFieldWidget({super.key, required this.controller});
+  const AppSearchFieldWidget({
+    super.key,
+    required this.controller,
+    required this.focusNode, // Передача FocusNode
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,8 @@ class AppSearchFieldWidget extends StatelessWidget {
       child: SizedBox(
         height: 42,
         child: TextField(
-          controller: controller, // добавлен контроллер
+          controller: controller,
+          focusNode: focusNode, // Использование FocusNode
           cursorColor: AppColors.gray,
           style: TextStyle(
             fontSize: 16,

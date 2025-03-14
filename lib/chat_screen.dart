@@ -15,6 +15,7 @@ class ChatScreen extends StatefulWidget {
   final String lastName;
   final Color color1;
   final Color color2;
+  final VoidCallback? onReturn;
 
   const ChatScreen({
     super.key,
@@ -22,6 +23,7 @@ class ChatScreen extends StatefulWidget {
     required this.lastName,
     required this.color1,
     required this.color2,
+    this.onReturn,
   });
 
   @override
@@ -56,7 +58,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void saveMessage(String message, String? imagePath) {
+  void saveMessage(String message, String? imagePath) async {
     final key = DateTime.now().millisecondsSinceEpoch.toString();
     final newMessage = Message(
       text: message,
@@ -64,12 +66,16 @@ class _ChatScreenState extends State<ChatScreen> {
       imagePath: imagePath,
     );
 
-    chatBox.put(key, newMessage);
+    await chatBox.put(key, newMessage);
+    await chatBox.flush(); // Синхронизируем данные с диском
     messageController.clear();
     setState(() {
       _imagePath = null;
     });
     _scrollToBottom();
+
+    // Вызываем колбэк после сохранения сообщения
+    widget.onReturn?.call();
   }
 
   void _scrollToBottom() {
@@ -96,10 +102,37 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    widget.onReturn?.call(); // Вызываем колбэк при закрытии экрана
+    super.dispose();
+  }
+
+  Map<String, List<Message>> groupMessagesByDate(List<Message> messages) {
+    final Map<String, List<Message>> groupedMessages = {};
+    final now = DateTime.now();
+    final today = DateFormat('dd.MM.yy').format(now);
+
+    for (final message in messages) {
+      // Получаем дату из времени сообщения
+      final messageDate = DateFormat('dd.MM.yy').format(DateTime.now());
+      final displayDate = (messageDate == today) ? "Сегодня" : messageDate;
+
+      if (!groupedMessages.containsKey(displayDate)) {
+        groupedMessages[displayDate] = [];
+      }
+      groupedMessages[displayDate]!.add(message);
+    }
+    return groupedMessages;
+  }
+
+  @override
+  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    groupMessagesByDate(chatBox.values.toList());
 
     return Scaffold(
       appBar: AppBar(
@@ -121,17 +154,75 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ValueListenableBuilder(
                 valueListenable: chatBox.listenable(),
                 builder: (context, Box<Message> box, _) {
+                  final groupedMessages = groupMessagesByDate(
+                    box.values.toList(),
+                  );
+
                   return ListView.builder(
                     controller: _scrollController,
-                    itemCount: box.values.length,
+                    itemCount: groupedMessages.length,
                     itemBuilder: (context, index) {
-                      final msg = box.getAt(index);
-                      if (msg == null) return SizedBox.shrink();
-                      return SendedMessageWidget(
-                        formattedTime: msg.timeStamp,
-                        message: msg.text,
-                        isImage: msg.imagePath != null,
-                        imagePath: msg.imagePath,
+                      final date = groupedMessages.keys.elementAt(index);
+                      final messages = groupedMessages[date]!;
+
+                      return Column(
+                        children: [
+                          // Отображаем дату только для первой группы сообщений
+                          if (index == 0)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      color: AppColors.gray,
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    child: Text(
+                                      date, // "Сегодня" или дата
+                                      style: TextStyle(
+                                        fontFamily: "Gilroy",
+                                        color: AppColors.gray,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      color: AppColors.gray,
+                                      height: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          SizedBox(height: 20),
+                          // Отображаем сообщения
+                          ...messages.map((message) {
+                            final key = box.keys.firstWhere(
+                              (k) => box.get(k) == message,
+                            );
+                            return SendedMessageWidget(
+                              formattedTime: message.timeStamp,
+                              message: message.text,
+                              isImage: message.imagePath != null,
+                              imagePath: message.imagePath,
+                              messageKey: key,
+                              onDelete: (key) {
+                                box.delete(key);
+                                setState(() {});
+                              },
+                            );
+                          }).toList(),
+                        ],
                       );
                     },
                   );

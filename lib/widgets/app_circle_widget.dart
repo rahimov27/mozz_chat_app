@@ -11,7 +11,7 @@ class AppCircleWidget extends StatelessWidget {
     required this.firstName,
     required this.lastName,
     required this.color1,
-    required this.color2
+    required this.color2,
   });
 
   @override
@@ -23,9 +23,7 @@ class AppCircleWidget extends StatelessWidget {
           height: 50,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [color1, color2],
-            ),
+            gradient: LinearGradient(colors: [color1, color2]),
           ),
           child: Align(
             alignment: Alignment.center,
