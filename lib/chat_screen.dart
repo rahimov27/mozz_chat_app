@@ -97,17 +97,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Map<String, List<Message>> groupMessagesByDate(List<Message> messages) {
     final Map<String, List<Message>> groupedMessages = {};
+    final now = DateTime.now();
+    final today = DateFormat('dd.MM.yy').format(now);
+
     for (final message in messages) {
       // Получаем дату из времени сообщения
-      final date = DateFormat('dd.MM.yy').format(DateTime.now());
-      if (!groupedMessages.containsKey(date)) {
-        groupedMessages[date] = [];
+      final messageDate = DateFormat('dd.MM.yy').format(DateTime.now());
+      final displayDate = (messageDate == today) ? "Сегодня" : messageDate;
+
+      if (!groupedMessages.containsKey(displayDate)) {
+        groupedMessages[displayDate] = [];
       }
-      groupedMessages[date]!.add(message);
+      groupedMessages[displayDate]!.add(message);
     }
     return groupedMessages;
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -168,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       horizontal: 10,
                                     ),
                                     child: Text(
-                                      date,
+                                      date, // "Сегодня" или дата
                                       style: TextStyle(
                                         fontFamily: "Gilroy",
                                         color: AppColors.gray,

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
 
 class SendedMessageWidget extends StatelessWidget {
@@ -175,7 +174,7 @@ class SendedMessageWidget extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 30),
+        SizedBox(height: 20),
       ],
     );
   }
