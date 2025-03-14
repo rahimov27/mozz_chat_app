@@ -27,28 +27,6 @@ class SendedMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Expanded(child: Container(color: AppColors.gray, height: 1)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  DateFormat('dd:MM.yy').format(DateTime.now()),
-                  style: TextStyle(
-                    fontFamily: "Gilroy",
-                    color: AppColors.gray,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Expanded(child: Container(color: AppColors.gray, height: 1)),
-            ],
-          ),
-        ),
-        SizedBox(height: 20),
         GestureDetector(
           onLongPress: () => onDelete(messageKey),
           child: ChatBubble(
