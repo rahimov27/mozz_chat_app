@@ -100,6 +100,28 @@ class _ChatsScreenState extends State<ChatsScreen> {
     }
   }
 
+  // Функция для удаления чата
+  void _deleteChat(int index) async {
+    final chat = filteredChats[index];
+    final chatId = getChatId(chat.firstName, chat.lastName);
+
+    // Удаляем бокс из Hive
+    await Hive.deleteBoxFromDisk(chatId);
+
+    // Удаляем чат из списка
+    setState(() {
+      filteredChats.removeAt(index);
+    });
+
+    // Показываем SnackBar с подтверждением удаления
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Чат с ${chat.firstName} ${chat.lastName} удален"),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -131,35 +153,48 @@ class _ChatsScreenState extends State<ChatsScreen> {
                   final chat = filteredChats[index];
                   final chatId = getChatId(chat.firstName, chat.lastName);
 
-                  return FutureBuilder<Message?>(
-                    future: getLastMessage(chatId),
-                    builder: (context, snapshot) {
-                      final lastMessage = snapshot.data;
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => ChatScreen(
-                                    firstName: chat.firstName,
-                                    lastName: chat.lastName,
-                                    color1: chat.color1,
-                                    color2: chat.color2,
-                                  ),
-                            ),
-                          );
-                        },
-                        child: AppChatWidgetRow(
-                          message: lastMessage?.text ?? "Нет сообщений",
-                          firstName: chat.firstName,
-                          lastName: chat.lastName,
-                          date: lastMessage?.timeStamp ?? chat.date,
-                          color1: chat.color1,
-                          color2: chat.color2,
-                        ),
-                      );
+                  return Dismissible(
+                    key: Key(chatId), // Уникальный ключ для каждого чата
+                    direction: DismissDirection.endToStart, // Свайп влево
+                    background: Container(
+                      color: Colors.red, // Красный фон при свайпе
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                    onDismissed: (direction) {
+                      _deleteChat(index); // Удаляем чат
                     },
+                    child: FutureBuilder<Message?>(
+                      future: getLastMessage(chatId),
+                      builder: (context, snapshot) {
+                        final lastMessage = snapshot.data;
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ChatScreen(
+                                      firstName: chat.firstName,
+                                      lastName: chat.lastName,
+                                      color1: chat.color1,
+                                      color2: chat.color2,
+                                    ),
+                              ),
+                            );
+                          },
+                          child: AppChatWidgetRow(
+                            message: lastMessage?.text ?? "Нет сообщений",
+                            firstName: chat.firstName,
+                            lastName: chat.lastName,
+                            date: lastMessage?.timeStamp ?? chat.date,
+                            color1: chat.color1,
+                            color2: chat.color2,
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
