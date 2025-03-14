@@ -1,16 +1,35 @@
-# mozz_chat_app
+# 🚀 Flutter-mozz_chat_app
 
-A new Flutter project.
+## 🛠️ Технологии
+- Flutter (Dart)
+- `bloc` / `flutter_bloc` – управление состоянием  
+- `flutter_svg` – поддержка SVG-изображений  
+- `intl` – локализация и форматирование дат  
+- `image_picker` – загрузка изображений  
+- `path_provider` – доступ к файловой системе  
+- `hive` / `hive_flutter` – локальное хранилище  
+- `flutter_chat_bubble` – стилизованные сообщения для чата  
 
-## Getting Started
+## 📦 Установка
 
-This project is a starting point for a Flutter application.
+### 1️⃣ Установите зависимости
+flutter pub get
 
-A few resources to get you started if this is your first Flutter project:
+### 2️⃣ Сгенерируйте код (если используется Hive или другие code generation пакеты)
+flutter pub run build_runner build --delete-conflicting-outputs
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 3️⃣ Запустите приложение
+#### 📱 Для Android / iOS:
+flutter run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 4️⃣ Сборка APK
+flutter build apk
+
+## 🚀 Функции
+✅ Локальное хранилище (Hive)  
+✅ Загрузка изображений (image_picker)  
+✅ Работа с датами и локализация (intl)  
+✅ Поддержка SVG-графики (flutter_svg)  
+✅ Чат с пузырями сообщений (flutter_chat_bubble)  
+
+
