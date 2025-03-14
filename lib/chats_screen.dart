@@ -17,12 +17,22 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
+  // searchController
   final TextEditingController _searchController = TextEditingController();
+
+  // focusNode for hiding textField
   final FocusNode _searchFocusNode = FocusNode();
+
+  // late variable of Hive
   late Box<Message> chatsBox;
+
+  // empty list of our messages
   List<Message> messages = [];
+
+  // empty list of our filteredChats
   List<AppChatWidgetRow> filteredChats = [];
 
+  // static chats for easily controlling and test the chats
   final List<AppChatWidgetRow> chats = [
     AppChatWidgetRow(
       firstName: "Виктор",
@@ -58,6 +68,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     ),
   ];
 
+  // init state method
   @override
   void initState() {
     super.initState();
@@ -66,10 +77,12 @@ class _ChatsScreenState extends State<ChatsScreen> {
     filteredChats = chats;
   }
 
+  // function which open out messages box which called chats
   void _openBox() async {
     chatsBox = await Hive.openBox<Message>('chats');
   }
 
+  // method to filter our chats
   void _filterChats() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -81,6 +94,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     });
   }
 
+  // mehtod for getting our chatID
   String getChatId(String firstName, String lastName) {
     final fullName = '${firstName}_${lastName}_chat';
     final bytes = utf8.encode(fullName);
@@ -88,6 +102,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     return hash.toString();
   }
 
+  // method for getting last message
   Future<Message?> getLastMessage(String chatId) async {
     try {
       if (!Hive.isBoxOpen(chatId)) {
@@ -100,20 +115,20 @@ class _ChatsScreenState extends State<ChatsScreen> {
     }
   }
 
-  // Функция для удаления чата
+  // method which delete message
   void _deleteChat(int index) async {
     final chat = filteredChats[index];
     final chatId = getChatId(chat.firstName, chat.lastName);
 
-    // Удаляем бокс из Hive
+    // deleted our box from Hive
     await Hive.deleteBoxFromDisk(chatId);
 
-    // Удаляем чат из списка
+    // delete our chat from list
     setState(() {
       filteredChats.removeAt(index);
     });
 
-    // Показываем SnackBar с подтверждением удаления
+    // show our Snackbar when we delete the chat
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Чат с ${chat.firstName} ${chat.lastName} удален"),
@@ -122,6 +137,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     );
   }
 
+  // clear our controllers
   @override
   void dispose() {
     _searchController.dispose();
@@ -152,18 +168,17 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 itemBuilder: (BuildContext context, int index) {
                   final chat = filteredChats[index];
                   final chatId = getChatId(chat.firstName, chat.lastName);
-
                   return Dismissible(
-                    key: Key(chatId), // Уникальный ключ для каждого чата
-                    direction: DismissDirection.endToStart, // Свайп влево
+                    key: Key(chatId), 
+                    direction: DismissDirection.endToStart, 
                     background: Container(
-                      color: Colors.red, // Красный фон при свайпе
+                      color: Colors.red, 
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Icon(Icons.delete, color: Colors.white),
                     ),
                     onDismissed: (direction) {
-                      _deleteChat(index); // Удаляем чат
+                      _deleteChat(index); 
                     },
                     child: FutureBuilder<Message?>(
                       future: getLastMessage(chatId),

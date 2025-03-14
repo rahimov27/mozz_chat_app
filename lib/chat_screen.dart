@@ -31,18 +31,29 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  // late variable for HiveBox
   late Box<Message> chatBox;
+
+  // messageController for sending messages
   final TextEditingController messageController = TextEditingController();
+
+  // scrollController for using scroll method
   final ScrollController _scrollController = ScrollController();
+
+  // variable for image path
   String? _imagePath;
+
+  // boolean for showing loading
   bool _isLoading = true;
 
+  // initState function which update screen
   @override
   void initState() {
     super.initState();
     _openBox();
   }
 
+  // function to get chat id
   String getChatId(String firstName, String lastName) {
     final fullName = '${firstName}_${lastName}_chat';
     final bytes = utf8.encode(fullName);
@@ -50,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return hash.toString();
   }
 
+  // function to open our box
   void _openBox() async {
     final chatId = getChatId(widget.firstName, widget.lastName);
     chatBox = await Hive.openBox<Message>(chatId);
@@ -58,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  // function to save our messages
   void saveMessage(String message, String? imagePath) async {
     final key = DateTime.now().millisecondsSinceEpoch.toString();
     final newMessage = Message(
@@ -65,19 +78,17 @@ class _ChatScreenState extends State<ChatScreen> {
       timeStamp: DateFormat('HH:mm').format(DateTime.now()),
       imagePath: imagePath,
     );
-
     await chatBox.put(key, newMessage);
-    await chatBox.flush(); // Синхронизируем данные с диском
+    await chatBox.flush();
     messageController.clear();
     setState(() {
       _imagePath = null;
     });
     _scrollToBottom();
-
-    // Вызываем колбэк после сохранения сообщения
     widget.onReturn?.call();
   }
 
+  // function which automatically scrolls our screen when we send the message
   void _scrollToBottom() {
     Future.delayed(Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
@@ -90,6 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  // function which helps us to pick our image
   void _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -101,12 +113,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // clear our contrllers and onReturn call
   @override
   void dispose() {
-    widget.onReturn?.call(); // Вызываем колбэк при закрытии экрана
+    widget.onReturn?.call();
     super.dispose();
   }
 
+  // filter our messages in chat
   Map<String, List<Message>> groupMessagesByDate(List<Message> messages) {
     final Map<String, List<Message>> groupedMessages = {};
     final now = DateTime.now();
@@ -126,14 +140,11 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     groupMessagesByDate(chatBox.values.toList());
-
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 0,
@@ -157,17 +168,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   final groupedMessages = groupMessagesByDate(
                     box.values.toList(),
                   );
-
                   return ListView.builder(
                     controller: _scrollController,
                     itemCount: groupedMessages.length,
                     itemBuilder: (context, index) {
                       final date = groupedMessages.keys.elementAt(index);
                       final messages = groupedMessages[date]!;
-
                       return Column(
                         children: [
-                          // Отображаем дату только для первой группы сообщений
                           if (index == 0)
                             Padding(
                               padding: const EdgeInsets.symmetric(
@@ -205,7 +213,6 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           SizedBox(height: 20),
-                          // Отображаем сообщения
                           ...messages.map((message) {
                             final key = box.keys.firstWhere(
                               (k) => box.get(k) == message,
