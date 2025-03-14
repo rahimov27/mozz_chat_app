@@ -8,12 +8,15 @@ class AppChatWidgetRow extends StatelessWidget {
   final String date;
   final Color color1;
   final Color color2;
+  final String message;
   const AppChatWidgetRow({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.date,
-    required this.color1, required this.color2
+    required this.color1,
+    required this.color2,
+    required this.message
   });
 
   @override
@@ -68,7 +71,7 @@ class AppChatWidgetRow extends StatelessWidget {
                               ),
                               SizedBox(width: 4),
                               Text(
-                                "Уже сделал?",
+                                message,
                                 style: TextStyle(
                                   fontFamily: "Gilroy",
                                   letterSpacing: 0,

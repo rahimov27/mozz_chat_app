@@ -198,7 +198,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(9.0),
-                      child: SvgPicture.asset("assets/svg/audio.svg"),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() async {
+                            await Hive.deleteBoxFromDisk("messages");
+                          });
+                        },
+                        child: SvgPicture.asset("assets/svg/audio.svg"),
+                      ),
                     ),
                   ),
                 ],
