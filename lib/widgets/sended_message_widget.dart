@@ -54,7 +54,6 @@ class SendedMessageWidget extends StatelessWidget {
             if (box.isNotEmpty) {
               var lastKey = box.keys.last;
               box.delete(lastKey);
-              print("Последнее сообщение удалено");
             }
           },
           child: ChatBubble(

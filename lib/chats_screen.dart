@@ -45,7 +45,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
       }
       return null; // Если сообщений нет
     } catch (e) {
-      print("Ошибка при открытии бокса: $e");
       return null;
     }
   }
@@ -96,7 +95,11 @@ class _ChatsScreenState extends State<ChatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: AppBarTitleWidget(), centerTitle: false),
+      appBar: AppBar(
+        title: AppBarTitleWidget(),
+        centerTitle: false,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: Column(
           children: [
