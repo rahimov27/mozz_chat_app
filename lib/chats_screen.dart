@@ -1,6 +1,7 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mozz_chat_app/chat_screen.dart';
 import 'package:mozz_chat_app/message_model.dart';
 import 'package:mozz_chat_app/theme/app_colors.dart';
@@ -17,14 +18,44 @@ class ChatsScreen extends StatefulWidget {
 
 class _ChatsScreenState extends State<ChatsScreen> {
   final TextEditingController _searchController = TextEditingController();
-
-  late Box<Message> box;
+  late Box<Message> chatsBox;
   List<Message> messages = [];
 
-  // Load messages from the box
-  loadMessages() async {
-    // Make sure to await the box to be opened
-    box = await Hive.openBox<Message>('messages');
+  @override
+  void initState() {
+    super.initState();
+    _openBox();
+  }
+
+  void _openBox() async {
+    chatsBox = await Hive.openBox<Message>('chats');
+  }
+
+  // Функция для получения последнего сообщения из бокса чата
+  Future<Message?> getLastMessage(String chatId) async {
+    try {
+      if (!Hive.isBoxOpen(chatId)) {
+        await Hive.openBox<Message>(
+          chatId,
+        ); // Открываем бокс, если он еще не открыт
+      }
+      final chatBox = Hive.box<Message>(chatId);
+      if (chatBox.isNotEmpty) {
+        return chatBox.values.last; // Возвращаем последнее сообщение
+      }
+      return null; // Если сообщений нет
+    } catch (e) {
+      print("Ошибка при открытии бокса: $e");
+      return null;
+    }
+  }
+
+  // Функция для создания уникального идентификатора чата
+  String getChatId(String firstName, String lastName) {
+    final fullName = '${firstName}_${lastName}_chat';
+    final bytes = utf8.encode(fullName);
+    final hash = sha256.convert(bytes);
+    return hash.toString();
   }
 
   final List<AppChatWidgetRow> chats = [
@@ -34,7 +65,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
       date: "Вчера",
       color1: AppColors.green1,
       color2: AppColors.green2,
-      message: "Empty",
+      message: "Empty", // Это значение будет заменено на последнее сообщение
     ),
     AppChatWidgetRow(
       firstName: "Саша",
@@ -62,42 +93,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
     ),
   ];
 
-  List<AppChatWidgetRow> _filteredChats = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _filteredChats = chats;
-    _searchController.addListener(_filterChats);
-    loadMessages(); // Make sure to call loadMessages here
-  }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_filterChats);
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filterChats() {
-    String query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredChats =
-          chats.where((chat) {
-            return chat.firstName.toLowerCase().contains(query) ||
-                chat.lastName.toLowerCase().contains(query);
-          }).toList();
-    });
-  }
-
-  void _deleteChat(int index) {
-    setState(() {
-      // Удаляем сообщение из Hive и из списка
-      box.deleteAt(index); // Удаление сообщения из Hive
-      _filteredChats.removeAt(index); // Удаление чата из отображаемого списка
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,60 +104,42 @@ class _ChatsScreenState extends State<ChatsScreen> {
             SizedBox(height: 24),
             Divider(color: AppColors.textFieldColor),
             Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: Hive.box<Message>('messages').listenable(),
-                builder: (context, Box<Message> box, _) {
-                  messages =
-                      box.values
-                          .toList(); // Automatically update messages when Hive changes
-                  return ListView.builder(
-                    itemCount: _filteredChats.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Dismissible(
-                        key: Key(_filteredChats[index].firstName),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (direction) {
-                          _deleteChat(index);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Chat Deleted")),
+              child: ListView.builder(
+                itemCount: chats.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final chat = chats[index];
+                  final chatId = getChatId(chat.firstName, chat.lastName);
+
+                  return FutureBuilder<Message?>(
+                    future: getLastMessage(chatId),
+                    builder: (context, snapshot) {
+                      final lastMessage = snapshot.data;
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ChatScreen(
+                                    firstName: chat.firstName,
+                                    lastName: chat.lastName,
+                                    color1: chat.color1,
+                                    color2: chat.color2,
+                                  ),
+                            ),
                           );
                         },
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Icon(Icons.delete, color: Colors.white),
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => ChatScreen(
-                                      firstName:
-                                          _filteredChats[index].firstName,
-                                      lastName: _filteredChats[index].lastName,
-                                      color1: _filteredChats[index].color1,
-                                      color2: _filteredChats[index].color2,
-                                    ),
-                              ),
-                            );
-                          },
-                          child: AppChatWidgetRow(
-                            message:
-                                messages.isNotEmpty
-                                    ? messages[messages.length - 1].text
-                                    : "",
-                            firstName: _filteredChats[index].firstName,
-                            lastName: _filteredChats[index].lastName,
-                            date:
-                                messages.isNotEmpty
-                                    ? messages[messages.length - 1].timeStamp
-                                    : "",
-                            color1: _filteredChats[index].color1,
-                            color2: _filteredChats[index].color2,
-                          ),
+                        child: AppChatWidgetRow(
+                          message:
+                              lastMessage?.text ??
+                              "Нет сообщений", // Используем последнее сообщение
+                          firstName: chat.firstName,
+                          lastName: chat.lastName,
+                          date:
+                              lastMessage?.timeStamp ??
+                              chat.date, // Используем дату последнего сообщения
+                          color1: chat.color1,
+                          color2: chat.color2,
                         ),
                       );
                     },

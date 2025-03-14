@@ -9,6 +9,7 @@ class AppChatWidgetRow extends StatelessWidget {
   final Color color1;
   final Color color2;
   final String message;
+
   const AppChatWidgetRow({
     super.key,
     required this.firstName,
@@ -16,7 +17,7 @@ class AppChatWidgetRow extends StatelessWidget {
     required this.date,
     required this.color1,
     required this.color2,
-    required this.message
+    required this.message,
   });
 
   @override

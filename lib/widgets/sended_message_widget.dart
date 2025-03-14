@@ -49,7 +49,7 @@ class SendedMessageWidget extends StatelessWidget {
         SizedBox(height: 20),
         GestureDetector(
           onLongPress: () {
-            var box = Hive.box<Message>('messages');
+            var box = Hive.box<Message>('chats');
 
             if (box.isNotEmpty) {
               var lastKey = box.keys.last;
