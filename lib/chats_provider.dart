@@ -123,4 +123,10 @@ class ChatsProvider extends ChangeNotifier {
     searchFocusNode.dispose();
     super.dispose();
   }
+
+  void initialize() async {
+  await _openBox();
+  filteredChats = chats;
+  notifyListeners();  // Refresh UI after loading data
+}
 }

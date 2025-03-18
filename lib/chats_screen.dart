@@ -61,19 +61,15 @@ class ChatsScreen extends StatelessWidget {
                             builder: (context, snapshot) {
                               final lastMessage = snapshot.data;
                               return GestureDetector(
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatScreen(
-                                        firstName: chat.firstName,
-                                        lastName: chat.lastName,
-                                        color1: chat.color1,
-                                        color2: chat.color2,
-                                      ),
-                                    ),
-                                  );
-                                },
+                                onTap: () {
+  _navigateToChatScreen(
+    context,
+    chat.firstName,
+    chat.lastName,
+    chat.color1,
+    chat.color2,
+  );
+},
                                 child: AppChatWidgetRow(
                                   message: lastMessage?.text ?? "Нет сообщений",
                                   firstName: chat.firstName,
@@ -97,4 +93,29 @@ class ChatsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _navigateToChatScreen(
+  BuildContext context,
+  String firstName,
+  String lastName,
+  Color color1,
+  Color color2,
+) async {
+  bool? updated = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ChatScreen(
+        firstName: firstName,
+        lastName: lastName,
+        color1: color1,
+        color2: color2,
+      ),
+    ),
+  );
+
+  // If ChatScreen returns true, refresh chats
+  if (updated == true) {
+    Provider.of<ChatsProvider>(context, listen: false).initialize();
+  }
+}
 }

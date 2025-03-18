@@ -22,7 +22,7 @@ class ChatAppBarWidget extends StatelessWidget {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.pop(context, true),
           child: SvgPicture.asset(
             "assets/svg/arrow-back.svg",
             width: 36,

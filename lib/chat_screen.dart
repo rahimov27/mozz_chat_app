@@ -36,16 +36,16 @@ class ChatScreen extends StatelessWidget {
 
           return Scaffold(
             appBar: AppBar(
-              leadingWidth: 0,
-              surfaceTintColor: Colors.transparent,
-              automaticallyImplyLeading: false,
-              title: ChatAppBarWidget(
-                firstName: firstName,
-                lastName: lastName,
-                color1: color1,
-                color2: color2,
-              ),
-            ),
+        leadingWidth: 0,
+        surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        title: ChatAppBarWidget(
+          firstName: firstName,
+          lastName: lastName,
+          color1: color1,
+          color2: color2,
+        ),
+      ),
             body: SafeArea(
               child: Column(
                 children: [
