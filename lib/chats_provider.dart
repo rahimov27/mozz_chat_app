@@ -93,16 +93,16 @@ class ChatsProvider extends ChangeNotifier {
 
   // method for getting last message
   Future<Message?> getLastMessage(String chatId) async {
-    try {
-      if (!Hive.isBoxOpen(chatId)) {
-        await Hive.openBox<Message>(chatId);
-      }
-      final chatBox = Hive.box<Message>(chatId);
-      return chatBox.isNotEmpty ? chatBox.values.last : null;
-    } catch (e) {
-      return null;
+  try {
+    if (!Hive.isBoxOpen(chatId)) {
+      await Hive.openBox<Message>(chatId);
     }
+    final chatBox = Hive.box<Message>(chatId);
+    return chatBox.isNotEmpty ? chatBox.values.last : null;
+  } catch (e) {
+    return null;
   }
+}
 
   // method which delete message
   Future<void> deleteChat(int index) async {
@@ -124,9 +124,34 @@ class ChatsProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  void initialize() async {
+void initialize() async {
   await _openBox();
-  filteredChats = chats;
-  notifyListeners();  // Refresh UI after loading data
+
+  // Получаем последний message для каждого чата
+  final chatMessages = await Future.wait(
+    chats.map((chat) async {
+      final chatId = getChatId(chat.firstName, chat.lastName);
+      final lastMessage = await getLastMessage(chatId);
+      return {
+        'chat': chat,
+        'time': lastMessage?.timeStamp ?? '00:00', // Обрабатываем null значение
+      };
+    }).toList(),
+  );
+
+  // Сортируем чаты по времени последнего сообщения
+  chatMessages.sort((a, b) {
+    final timeA = a['time'] as String? ?? '00:00';
+    final timeB = b['time'] as String? ?? '00:00';
+
+    return timeB.compareTo(timeA);  // Сортируем по убыванию времени
+  });
+
+  // Применяем отсортированные чаты, преобразуя их обратно в список чатов
+  filteredChats = chatMessages.map((item) => item['chat'] as AppChatWidgetRow).toList();
+
+  notifyListeners();  // Обновляем UI после сортировки
 }
+
+
 }
