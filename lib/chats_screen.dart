@@ -70,7 +70,6 @@ class ChatsScreen extends StatelessWidget {
                                         lastName: chat.lastName,
                                         color1: chat.color1,
                                         color2: chat.color2,
-                                        onReturn: () {},
                                       ),
                                     ),
                                   );
